@@ -19,7 +19,7 @@ export function AppHeader() {
               <a href="https://orkesto.se">Agency</a>
             </li>
             <li>
-              <a href="https://orkesto.se/website">Website</a>
+              <Link href="/website">Website</Link>
             </li>
           </ul>
         </nav>
