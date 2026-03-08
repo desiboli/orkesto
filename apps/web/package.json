@@ -26,6 +26,7 @@
     "better-auth": "^1.5.4",
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.1",
+    "e2b": "^2.14.1",
     "inngest": "^3.52.6",
     "lucide-react": "^0.577.0",
     "next": "16.1.6",
