@@ -1,5 +1,5 @@
-import { userRouter } from "./auth/router"
-import { testingaiRouter } from "./testingai/router"
+import { userRouter } from "@/features/auth/router"
+import { testingaiRouter } from "@/features/testingai/router"
 
 export const router = {
   user: userRouter,

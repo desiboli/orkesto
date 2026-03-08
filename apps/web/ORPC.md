@@ -25,9 +25,11 @@ This is the main app router. It combines feature routers:
 
 ```ts
 import { userRouter } from "@/features/auth/router"
+import { testingaiRouter } from "@/features/testingai/router"
 
 export const router = {
   user: userRouter,
+  testingai: testingaiRouter,
 }
 ```
 
@@ -680,11 +682,20 @@ This improves:
 
 ## Suggested Folder Convention
 
-For each new feature, a simple starting pattern is:
+Features are colocated under `features/<name>/`. For each new feature:
 
 ```text
 apps/web/features/projects/
   router.ts
+  components/
+```
+
+If a feature uses Inngest background jobs, add them alongside:
+
+```text
+apps/web/features/projects/
+  router.ts
+  functions.ts
   components/
 ```
 
@@ -745,6 +756,9 @@ If you want one real reference, start with:
 
 - `apps/web/app/router/procedures.ts`
 - `apps/web/features/auth/router.ts`
+- `apps/web/features/testingai/router.ts`
 - `apps/web/app/router/index.ts`
 
 That is the smallest complete example already working in this codebase.
+
+Features use colocation: each feature lives under `features/<name>/` with its `router.ts`, `components/`, and optionally `functions.ts` (for Inngest jobs). Register routers in `app/router/index.ts` and Inngest functions in `app/api/inngest/route.ts`.

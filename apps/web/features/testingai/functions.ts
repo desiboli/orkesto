@@ -1,5 +1,5 @@
 import { openai, createAgent } from "@inngest/agent-kit"
-import { inngest } from "./client"
+import { inngest } from "@/inngest/client"
 
 export const helloWorld = inngest.createFunction(
   { id: "hello-world" },
