@@ -1,10 +1,13 @@
 import { Geist_Mono, Outfit, Space_Grotesk } from "next/font/google"
 
 import "@workspace/ui/globals.css"
+import "../lib/orpc.server" // for pre-rendering
 import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@workspace/ui/lib/utils";
+import { Providers } from "@/app/providers"
+import { cn } from "@workspace/ui/lib/utils"
+import { Toaster } from "@workspace/ui/components/sonner"
 
-const outfit = Outfit({ subsets: ['latin'], variable: '--font-sans' })
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" })
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-display' })
 const fontMono = Geist_Mono({
   subsets: ["latin"],
@@ -23,9 +26,12 @@ export default function RootLayout({
       className={cn("antialiased", fontMono.variable, "font-sans", outfit.variable, spaceGrotesk.variable)}
     >
       <body>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <Providers>
+          <ThemeProvider>
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   )
