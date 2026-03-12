@@ -6,7 +6,7 @@ import { authedProcedure } from "@/app/router/procedures"
 const UserSchema = z.object({
   id: z.string(),
   name: z.string(),
-  email: z.string().email(),
+  email: z.email(),
   image: z.string().nullable(),
 })
 
