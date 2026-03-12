@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm"
 import { pgEnum, pgTable, text, timestamp, jsonb } from "drizzle-orm/pg-core"
 import { createId } from "@paralleldrive/cuid2"
+import { project } from "./project.schema"
 
 export const messageRoleEnum = pgEnum("message_role", ["USER", "ASSISTANT"])
 export const messageTypeEnum = pgEnum("message_type", ["RESULT", "ERROR"])
@@ -17,6 +18,9 @@ export const message = pgTable("message", {
     .defaultNow()
     .$onUpdate(() => new Date())
     .notNull(),
+  projectId: text("project_id")
+    .notNull()
+    .references(() => project.id, { onDelete: "cascade" }),
 })
 
 export const fragment = pgTable("fragment", {
@@ -39,6 +43,10 @@ export const fragment = pgTable("fragment", {
 
 export const messageRelations = relations(message, ({ one }) => ({
   fragment: one(fragment),
+  project: one(project, {
+    fields: [message.projectId],
+    references: [project.id],
+  }),
 }))
 
 export const fragmentRelations = relations(fragment, ({ one }) => ({
