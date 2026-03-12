@@ -13,7 +13,7 @@ export const invokeBackgroundJob = authedProcedure
   .input(InvokeBackgroundJobInput)
   .handler(async ({ input }) => {
     await inngest.send({
-      name: "test/hello.world",
+      name: "code-agent/run",
       data: {
         value: input.value,
       },

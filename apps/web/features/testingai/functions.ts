@@ -5,16 +5,24 @@ import {
   createAgent,
   createTool,
   createNetwork,
+  Tool,
 } from "@inngest/agent-kit"
 import { inngest } from "@/inngest/client"
 import { step } from "inngest"
 import { getSandbox, lastAssistantTextMessageContent } from "@/inngest/utils"
 import { z } from "zod"
 import { PROMPT } from "@/prompt"
+import { db } from "@/db/drizzle"
+import { fragment, message } from "@/db/schema"
 
-export const helloWorld = inngest.createFunction(
-  { id: "hello-world" },
-  { event: "test/hello.world" },
+interface AgentState {
+  summary: string
+  files: { [path: string]: string }
+}
+
+export const codeAgentFunction = inngest.createFunction(
+  { id: "code-agent" },
+  { event: "code-agent/run" },
   async ({ event }) => {
     const sandboxId = await step.run("get-sandbox-id", async () => {
       const sandbox = await Sandbox.create("nextjs-template-dev")
@@ -31,22 +39,22 @@ export const helloWorld = inngest.createFunction(
     })
 
     // Create a new agent with a system prompt (you can add optional tools, too)
-    const codeAgent = createAgent({
+    const codeAgent = createAgent<AgentState>({
       name: "code-agent",
       description: "An expert coding agent",
       system: PROMPT,
-      model: anthropic({
-        model: "claude-sonnet-4-20250514",
-        defaultParameters: {
-          max_tokens: 4096,
-        },
-      }),
-      // model: openai({
-      //   model: "gpt-4.1",
+      // model: anthropic({
+      //   model: "claude-sonnet-4-20250514",
       //   defaultParameters: {
-      //     temperature: 0.1,
+      //     max_tokens: 4096,
       //   },
       // }),
+      model: openai({
+        model: "gpt-4.1",
+        defaultParameters: {
+          temperature: 0.1,
+        },
+      }),
       tools: [
         createTool({
           name: "terminal",
@@ -91,7 +99,10 @@ export const helloWorld = inngest.createFunction(
               })
             ),
           }),
-          handler: async ({ files }, { step, network }) => {
+          handler: async (
+            { files },
+            { step, network }: Tool.Options<AgentState>
+          ) => {
             const newFiles = await step?.run(
               "createOrUpdateFiles",
               async () => {
@@ -181,7 +192,7 @@ export const helloWorld = inngest.createFunction(
       },
     })
 
-    const network = createNetwork({
+    const network = createNetwork<AgentState>({
       name: "code-agent-network",
       agents: [codeAgent],
       maxIter: 25,
@@ -199,10 +210,47 @@ export const helloWorld = inngest.createFunction(
     const prompt = `<project_structure>\n${projectContext}\n</project_structure>\n\n<user_request>\n${event.data.value}\n</user_request>`
     const result = await network.run(prompt)
 
+    const isError =
+      !result.state.data.summary ||
+      Object.keys(result.state.data.files || {}).length === 0
+
     const sandboxUrl = await step.run("get-sandbox-url", async () => {
       const sandbox = await getSandbox(sandboxId)
       const host = sandbox.getHost(3000)
       return `http://${host}`
+    })
+
+    await step.run("save-result", async () => {
+      if (isError) {
+        return await db.insert(message).values({
+          content: "Something went wrong. Please try again.",
+          role: "ASSISTANT",
+          type: "ERROR",
+        })
+      }
+
+      return await db.transaction(async (tx) => {
+        const [createdMessage] = await tx
+          .insert(message)
+          .values({
+            content: result.state.data.summary,
+            role: "ASSISTANT",
+            type: "RESULT",
+          })
+          .returning({ id: message.id })
+
+        if (!createdMessage) {
+          throw new Error("Failed to create message")
+        }
+
+        await tx.insert(fragment).values({
+          messageId: createdMessage.id,
+          sandboxUrl,
+          title: "Fragment",
+          files: result.state.data.files,
+        })
+        return createdMessage
+      })
     })
 
     return {
