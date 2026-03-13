@@ -223,6 +223,7 @@ export const codeAgentFunction = inngest.createFunction(
     await step.run("save-result", async () => {
       if (isError) {
         return await db.insert(message).values({
+          projectId: event.data.projectId,
           content: "Something went wrong. Please try again.",
           role: "ASSISTANT",
           type: "ERROR",
@@ -233,6 +234,7 @@ export const codeAgentFunction = inngest.createFunction(
         const [createdMessage] = await tx
           .insert(message)
           .values({
+            projectId: event.data.projectId,
             content: result.state.data.summary,
             role: "ASSISTANT",
             type: "RESULT",

@@ -8,7 +8,8 @@ import { message } from "@/db/schema"
 import { inngest } from "@/inngest/client"
 
 const MessagesSchema = z.object({
-  value: z.string().min(1, { message: "Message is required" }),
+  value: z.string().min(1, "Value is required").max(10000, "Value is too long"),
+  projectId: z.string().min(1, "Project ID is required"),
 })
 
 const MessageSchema = z.object({
@@ -38,6 +39,7 @@ export const create = authedProcedure
     const [createdMessage] = await db
       .insert(message)
       .values({
+        projectId: input.projectId,
         content: input.value,
         role: "USER",
         type: "RESULT",
@@ -48,6 +50,7 @@ export const create = authedProcedure
       name: "code-agent/run",
       data: {
         value: input.value,
+        projectId: input.projectId,
       },
     })
 
