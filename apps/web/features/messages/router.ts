@@ -2,7 +2,7 @@ import "server-only"
 
 import { authedProcedure } from "@/app/router/procedures"
 import { db } from "@/db/drizzle"
-import { desc } from "drizzle-orm"
+import { asc, eq } from "drizzle-orm"
 import * as z from "zod"
 import { message } from "@/db/schema"
 import { inngest } from "@/inngest/client"
@@ -12,21 +12,16 @@ const MessagesSchema = z.object({
   projectId: z.string().min(1, "Project ID is required"),
 })
 
-const MessageSchema = z.object({
-  id: z.string(),
-  content: z.string(),
-  role: z.enum(["USER", "ASSISTANT"]),
-  type: z.enum(["RESULT", "ERROR"]),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-})
-
 export const getMany = authedProcedure
   .route({ method: "GET", path: "/messages" })
-  .output(z.array(MessageSchema))
-  .handler(async () => {
+  .input(z.object({ projectId: z.string().min(1, "Project ID is required") }))
+  .handler(async ({ input }) => {
     const messages = await db.query.message.findMany({
-      orderBy: desc(message.updatedAt),
+      with: {
+        fragment: true,
+      },
+      where: eq(message.projectId, input.projectId),
+      orderBy: asc(message.updatedAt),
     })
 
     return messages

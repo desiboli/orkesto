@@ -55,3 +55,8 @@ export const fragmentRelations = relations(fragment, ({ one }) => ({
     references: [message.id],
   }),
 }))
+
+export type MessageRole = (typeof messageRoleEnum.enumValues)[number]
+export type MessageType = (typeof messageTypeEnum.enumValues)[number]
+export type Message = typeof message.$inferSelect
+export type Fragment = typeof fragment.$inferSelect
