@@ -2,7 +2,8 @@ import { Geist_Mono, Outfit, Space_Grotesk } from "next/font/google"
 
 import "@workspace/ui/globals.css"
 import "../lib/orpc.server" // for pre-rendering
-import { ThemeProvider } from "@/components/theme-provider"
+// import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "next-themes"
 import { Providers } from "@/app/providers"
 import { cn } from "@workspace/ui/lib/utils"
 import { Toaster } from "@workspace/ui/components/sonner"
@@ -27,7 +28,7 @@ export default function RootLayout({
     >
       <body>
         <Providers>
-          <ThemeProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             {children}
             <Toaster />
           </ThemeProvider>
