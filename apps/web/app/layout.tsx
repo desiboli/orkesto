@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes"
 import { Providers } from "@/app/providers"
 import { cn } from "@workspace/ui/lib/utils"
 import { Toaster } from "@workspace/ui/components/sonner"
+import { TooltipProvider } from "@workspace/ui/components/tooltip"
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" })
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-display' })
@@ -29,7 +30,9 @@ export default function RootLayout({
       <body>
         <Providers>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            {children}
+            <TooltipProvider>
+              {children}
+            </TooltipProvider>
             <Toaster />
           </ThemeProvider>
         </Providers>

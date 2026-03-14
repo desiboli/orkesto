@@ -5,6 +5,7 @@ import { MessagesContainer } from "./messages-container"
 import { Suspense, useState } from "react"
 import { Fragment } from "@/db/schema"
 import { ProjectHeader } from "./project-header"
+import { FragmentWeb } from "./fragment-web"
 
 interface Props {
   projectId: string
@@ -30,7 +31,7 @@ export const ProjectView = ({ projectId }: Props) => {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize="65%" minSize="20%" className="flex flex-col min-h-0">
-          TODO: Preview
+          {activeFragment && <FragmentWeb fragment={activeFragment} />}
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
