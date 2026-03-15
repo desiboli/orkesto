@@ -14,11 +14,11 @@ export default async function Page({ params }: PageProps) {
   const queryClient = getQueryClient()
   await Promise.all([
     queryClient.prefetchQuery(orpc.messages.getMany.queryOptions({ input: { projectId: websiteId } })),
-    queryClient.prefetchQuery(orpc.projects.getOne.queryOptions({ input: { id: websiteId } })),
+    queryClient.prefetchQuery(orpc.projects.getOne.queryOptions({ input: { params: { id: websiteId } } })),
   ])
 
   const projectData = queryClient.getQueryData(
-    orpc.projects.getOne.queryOptions({ input: { id: websiteId } }).queryKey,
+    orpc.projects.getOne.queryOptions({ input: { params: { id: websiteId } } }).queryKey,
   )
   if (!projectData) {
     notFound()

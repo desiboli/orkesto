@@ -1,26 +1,24 @@
-import Link from "next/link"
-import Image from "next/image"
-import { useSuspenseQuery } from "@tanstack/react-query"
 import { orpc } from "@/lib/query/orpc"
+import { useSuspenseQuery } from "@tanstack/react-query"
+import { Button } from "@workspace/ui/components/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuPortal,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@workspace/ui/components/dropdown-menu"
-import { Button } from "@workspace/ui/components/button"
 import { ChevronDownIcon, ChevronLeftIcon, SunMoonIcon } from "lucide-react"
 import { useTheme } from "next-themes"
+import Image from "next/image"
+import Link from "next/link"
 
 
 interface Props {
@@ -28,7 +26,7 @@ interface Props {
 }
 
 export const ProjectHeader = ({ projectId }: Props) => {
-  const { data: project } = useSuspenseQuery(orpc.projects.getOne.queryOptions({ input: { id: projectId } }))
+  const { data: project } = useSuspenseQuery(orpc.projects.getOne.queryOptions({ input: { params: { id: projectId } } }))
   const { setTheme, theme } = useTheme()
 
   return (

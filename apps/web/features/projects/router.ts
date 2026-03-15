@@ -1,13 +1,13 @@
 import "server-only"
 
-import { generateSlug } from "random-word-slugs"
-import { desc, eq } from "drizzle-orm"
-import * as z from "zod"
 import { authedProcedure } from "@/app/router/procedures"
 import { db } from "@/db/drizzle"
 import { message, project } from "@/db/schema"
 import { inngest } from "@/inngest/client"
 import { ORPCError } from "@orpc/client"
+import { desc, eq } from "drizzle-orm"
+import { generateSlug } from "random-word-slugs"
+import * as z from "zod"
 
 const ProjectSchema = z.object({
   id: z.string(),
@@ -21,11 +21,17 @@ const CreateProjectInput = z.object({
 })
 
 export const getOne = authedProcedure
-  .route({ method: "GET", path: "/projects/{id}" })
-  .input(z.object({ id: z.string().min(1, "Id is required") }))
-  .handler(async ({ input }) => {
+  .route({ method: "GET", path: "/projects/{id}", inputStructure: "detailed" })
+  .input(
+    z.object({
+      params: z.object({
+        id: z.string().min(1, "Id is required"),
+      }),
+    })
+  )
+  .handler(async ({ input: { params } }) => {
     const existingProject = await db.query.project.findFirst({
-      where: eq(project.id, input.id),
+      where: eq(project.id, params.id),
     })
 
     if (!existingProject) {
