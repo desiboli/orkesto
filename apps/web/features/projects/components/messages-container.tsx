@@ -1,9 +1,9 @@
+import { Fragment } from "@/db/schema"
 import { orpc } from "@/lib/query/orpc"
 import { useSuspenseQuery } from "@tanstack/react-query"
+import { useEffect, useRef } from "react"
 import { MessageCard } from "./message-card"
 import { MessageForm } from "./message-form"
-import { useEffect, useRef } from "react"
-import { Fragment } from "@/db/schema"
 import { MessageLoading } from "./message-loading"
 
 interface Props {
@@ -14,15 +14,19 @@ interface Props {
 
 export const MessagesContainer = ({ projectId, activeFragment, setActiveFragment }: Props) => {
   const bottomRef = useRef<HTMLDivElement>(null)
+  const lastAssistantMessageIdRef = useRef<string | null>(null)
   const { data: messages } = useSuspenseQuery(orpc.messages.getMany.queryOptions({ input: { projectId }, refetchInterval: 5000 }))
 
-  // useEffect(() => {
-  //   const lastAssistantMessageWithFragment = messages.find((message) => message.role === "ASSISTANT" && !!message.fragment)
+  useEffect(() => {
+    const lastAssistantMessage = messages.find((message) => message.role === "ASSISTANT")
 
-  //   if (lastAssistantMessageWithFragment) {
-  //     setActiveFragment(lastAssistantMessageWithFragment.fragment!)
-  //   }
-  // }, [messages, setActiveFragment])
+    if (lastAssistantMessage?.fragment &&
+      lastAssistantMessage.id !== lastAssistantMessageIdRef.current
+    ) {
+      setActiveFragment(lastAssistantMessage.fragment)
+      lastAssistantMessageIdRef.current = lastAssistantMessage.id
+    }
+  }, [messages, setActiveFragment])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
