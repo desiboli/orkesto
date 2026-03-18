@@ -18,7 +18,7 @@ export const MessagesContainer = ({ projectId, activeFragment, setActiveFragment
   const { data: messages } = useSuspenseQuery(orpc.messages.getMany.queryOptions({ input: { projectId }, refetchInterval: 5000 }))
 
   useEffect(() => {
-    const lastAssistantMessage = messages.find((message) => message.role === "ASSISTANT")
+    const lastAssistantMessage = messages.findLast((message) => message.role === "ASSISTANT")
 
     if (lastAssistantMessage?.fragment &&
       lastAssistantMessage.id !== lastAssistantMessageIdRef.current
