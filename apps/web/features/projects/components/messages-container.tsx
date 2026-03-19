@@ -13,7 +13,8 @@ interface Props {
 }
 
 export const MessagesContainer = ({ projectId, activeFragment, setActiveFragment }: Props) => {
-  const bottomRef = useRef<HTMLDivElement>(null)
+  // const bottomRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const lastAssistantMessageIdRef = useRef<string | null>(null)
   const { data: messages } = useSuspenseQuery(orpc.messages.getMany.queryOptions({ input: { projectId }, refetchInterval: 5000 }))
 
@@ -28,16 +29,30 @@ export const MessagesContainer = ({ projectId, activeFragment, setActiveFragment
     }
   }, [messages, setActiveFragment])
 
+  // useEffect(() => {
+  //   bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+  // }, [messages.length])
+
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages.length])
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = containerRef.current
+        if (!el) return
+
+        el.scrollTo({
+          top: el.scrollHeight,
+          behavior: "auto",
+        })
+      })
+    })
+  }, [messages.length, projectId])
 
   const lastMessage = messages[messages.length - 1]
   const isLastMessageUser = lastMessage?.role === "USER"
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto" ref={containerRef}>
         <div className="pt-2 pr-1">
           {messages.map((message) => (
             <MessageCard
@@ -54,7 +69,7 @@ export const MessagesContainer = ({ projectId, activeFragment, setActiveFragment
             />
           ))}
           {isLastMessageUser && <MessageLoading />}
-          <div ref={bottomRef} />
+          {/* <div ref={bottomRef} /> */}
         </div>
       </div>
 

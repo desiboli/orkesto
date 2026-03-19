@@ -21,7 +21,7 @@ export const ProjectView = ({ projectId }: Props) => {
   const [tabsState, setTabsState] = useState<"preview" | "code">("preview")
 
   return (
-    <div className="h-screen">
+    <div className="h-screen min-h-0">
       <ResizablePanelGroup orientation="horizontal">
         <ResizablePanel
           defaultSize="35%"
