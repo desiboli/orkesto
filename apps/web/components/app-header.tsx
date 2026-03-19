@@ -1,7 +1,7 @@
-import Image from "next/image"
 import orkestoLogo from "@/public/orkesto.svg"
 import { Button } from "@workspace/ui/components/button"
 import { LogOutIcon } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 
 export function AppHeader() {
@@ -16,7 +16,7 @@ export function AppHeader() {
         <nav>
           <ul className="flex items-center gap-6">
             <li>
-              <a href="https://orkesto.se">Agency</a>
+              <a href="https://orkesto.se" target="_blank" rel="noreferrer">Agency</a>
             </li>
             <li>
               <Link href="/website">Website</Link>
